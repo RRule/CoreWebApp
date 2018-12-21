@@ -1,0 +1,54 @@
+﻿@model CoreWebApp.Controllers.UrlController.UrlModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Enter a URL to scrape</h1>
+    <form class="form" method="get">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="LabelInputUrl" class="col-3 col-form-label">Url</label>
+                        @Html.TextBox("url", Model.Url, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="col">
+                    <div class=" col-1 form-group">
+                        <button type="submit" class="btn btn-primary btn-sm">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="container">
+        <div class="row">
+            @{
+                if (Model.UrlList != null)
+                {
+                    foreach (var url in Model.UrlList)
+                    {
+                        <div class="col-2">
+                            <div class=" card">
+                                <div class="card-body">
+                                    @Html.Raw(url.InnerHtml)
+                                    @if (url.ImageUrl != null)
+                                    {
+                                        @Html.Raw(url.ImageUrl)
+
+                                    }
+                                </div>
+                                <div class="card-footer" style="font-size: 0.7em;">
+                                    <a href="@url.Domain/@url.InnerHtml">@url.Domain/@url.InnerHtml</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </div>
+
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
