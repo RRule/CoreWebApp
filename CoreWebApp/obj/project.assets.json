@@ -13037,11 +13037,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\verschui\\source\\repos\\CoreWebApp\\CoreWebApp\\CoreWebApp.csproj",
+      "projectUniqueName": "C:\\Development_local\\CoreWebApp\\CoreWebApp\\CoreWebApp\\CoreWebApp.csproj",
       "projectName": "CoreWebApp",
-      "projectPath": "C:\\Users\\verschui\\source\\repos\\CoreWebApp\\CoreWebApp\\CoreWebApp.csproj",
+      "projectPath": "C:\\Development_local\\CoreWebApp\\CoreWebApp\\CoreWebApp\\CoreWebApp.csproj",
       "packagesPath": "C:\\Users\\verschui\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\verschui\\source\\repos\\CoreWebApp\\CoreWebApp\\obj\\",
+      "outputPath": "C:\\Development_local\\CoreWebApp\\CoreWebApp\\CoreWebApp\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
