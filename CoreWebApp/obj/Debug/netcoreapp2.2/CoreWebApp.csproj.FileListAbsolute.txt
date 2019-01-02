@@ -64,3 +64,7 @@ C:\Development_local\CoreWebApp\CoreWebApp\CoreWebApp\obj\Debug\netcoreapp2.2\Co
 C:\Development_local\CoreWebApp\CoreWebApp\CoreWebApp\obj\Debug\netcoreapp2.2\CoreWebApp.dll
 C:\Development_local\CoreWebApp\CoreWebApp\CoreWebApp\obj\Debug\netcoreapp2.2\CoreWebApp.pdb
 C:\Development_local\CoreWebApp\CoreWebApp\CoreWebApp\obj\Debug\netcoreapp2.2\CoreWebApp.csproj.CopyComplete
+C:\Development_local\CoreWebApp\CoreWebApp\CoreWebApp\obj\Debug\netcoreapp2.2\Razor\Views\Product\Index.g.cshtml.cs
+C:\Development_local\CoreWebApp\CoreWebApp\CoreWebApp\obj\Debug\netcoreapp2.2\Razor\Views\Product\_ProductPreviewBlock.g.cshtml.cs
+C:\Development_local\CoreWebApp\CoreWebApp\CoreWebApp\obj\Debug\netcoreapp2.2\Razor\Views\Product\_ProductPreviewList.g.cshtml.cs
+C:\Development_local\CoreWebApp\CoreWebApp\CoreWebApp\obj\Debug\netcoreapp2.2\Razor\Views\Shared\FormFilterSimple.g.cshtml.cs

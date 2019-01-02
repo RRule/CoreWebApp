@@ -1,0 +1,21 @@
+﻿@using System.Collections
+@using System.Reflection
+@model CoreWebApp.Models.ProductViewModel
+@{
+    ViewData["Title"] = "products";
+}
+<h1>Products page</h1>
+
+@Model.searchstring
+<br />
+<partial name="FormFilterSimple" />
+<br />
+
+<div class="container">
+    <div id="products" class="row list-group">
+        @foreach (var prod in Model.Products)
+        {
+            <partial name="_ProductPreviewBlock" model="prod" />
+        }
+    </div>
+</div>
