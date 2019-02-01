@@ -1,10 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@*@inject IMenuItemRepository MenuManager
-    @inject UserManager<MyUser> _UserManager*@
-@*@{
-        var user = await _UserManager.GetUserAsync(User);
-        var jsonSideBarItems = Newtonsoft.Json.JsonConvert.SerializeObject(MenuManager.GetSideBarMenu().ToList());
-    }*@
+@inject IMenuItemRepository MenuManager
+@inject UserManager<MyUser> _UserManager
+@{
+    var user = await _UserManager.GetUserAsync(User);
+    var jsonSideBarItems = Newtonsoft.Json.JsonConvert.SerializeObject(MenuManager.GetSideBarMenu().ToList());
+}
 <template id="navigation">
     <div id="navigation-container">
         @* Drawer  *@
@@ -24,7 +24,7 @@
                     </v-list-tile-avatar>
 
                     <v-list-tile-content>
-                        <v-list-tile-title>@*@user.FirstName @user.LastName*@</v-list-tile-title>
+                        <v-list-tile-title>@user.FirstName @user.LastName</v-list-tile-title>
                     </v-list-tile-content>
                 </v-list-tile>
             </v-list>
@@ -152,7 +152,7 @@
     var sideBar = Vue.component('comp-navigation',
         {
             template: '#navigation',
-            data: function () {
+            data: function() {
                 return {
                     iconsize: 12,
                     drawer: {
@@ -163,9 +163,9 @@
                         mini: false
                     },
                     right: null,
-                    items: {},
+                    items: @Html.Raw(jsonSideBarItems),
                     activeCustNum: {
-                        CustomerId: ''
+                        CustomerId: '@user.ActiveCustomerNumber'
                     },
                     shoppingCartItems: 1
                 }
@@ -175,52 +175,52 @@
                 userconcepts: String,
             },
             computed: {
-                selectedCustomer: function () {
+                selectedCustomer: function (){
                     return this.usercustomers.find(cust => cust.CustomerId === this.activeCustNum);
                 }
             },
             methods: {
-                addShoppingCart: function () {
+                addShoppingCart: function(){
                     this.shoppingCartItems = this.shoppingCartItems + 1;
                 },
-                logout: function () {
+                logout: function() {
                     document.getElementById("logout").submit();
                 },
-                updateActiveCustomer: function (val) {
+                updateActiveCustomer: function (val){
                     console.log(val);
                     var self = this;
                     api({
-                        method: 'post',
-                        url: '/Secure/UpdateActiveCustomer',
-                        data: {
-                            customerNumber: val
-                        }
-                    })
-                        .then(function (response) {
+                            method: 'post',
+                            url: '/Secure/UpdateActiveCustomer',
+                            data: {
+                                customerNumber: val
+                            }
+                        })
+                        .then( function(response) {
                             if (response.data) {
                                 setCookie("activeCustomerNumber", response.data, 1);
                                 location.reload();
                             }
                         })
-                        .catch(function (error) {
+                        .catch(function(error) {
                             app.showSnackbar('red', error);
 
                         });
                 },
-                updateUserActivity: function () {
+                updateUserActivity: function (){
                     api({
-                        method: 'get',
-                        url: '/Secure/UpdateUserActivity'
-                    })
-                        .then(function (response) {
+                            method: 'get',
+                            url: '/Secure/UpdateUserActivity'
                         })
-                        .catch(function (error) {
+                        .then( function(response) {
+                        })
+                        .catch(function(error) {
                             app.showSnackbar('red', error);
                         });
                 },
-                activate: function () {
+                activate: function() {
                     var that = this;
-                    setTimeout(function () {
+                    setTimeout(function() {
                         that.updateUserActivity();
                     }, 1500);
                 },
@@ -248,7 +248,7 @@
                     setCookie("drawer", val, 1);
                 },
             },
-            mounted: function () {
+            mounted: function() {
                 console.log(document.cookie);
                 this.activate();
             }

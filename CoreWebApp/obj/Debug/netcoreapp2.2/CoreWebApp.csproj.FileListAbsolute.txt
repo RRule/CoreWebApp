@@ -68,3 +68,4 @@ C:\Development_local\CoreWebApp\CoreWebApp\CoreWebApp\obj\Debug\netcoreapp2.2\Ra
 C:\Development_local\CoreWebApp\CoreWebApp\CoreWebApp\obj\Debug\netcoreapp2.2\Razor\Views\Product\_ProductPreviewBlock.g.cshtml.cs
 C:\Development_local\CoreWebApp\CoreWebApp\CoreWebApp\obj\Debug\netcoreapp2.2\Razor\Views\Product\_ProductPreviewList.g.cshtml.cs
 C:\Development_local\CoreWebApp\CoreWebApp\CoreWebApp\obj\Debug\netcoreapp2.2\Razor\Views\Shared\FormFilterSimple.g.cshtml.cs
+C:\Development_local\CoreWebApp\CoreWebApp\CoreWebApp\obj\Debug\netcoreapp2.2\Razor\Views\Components\Navigation.g.cshtml.cs

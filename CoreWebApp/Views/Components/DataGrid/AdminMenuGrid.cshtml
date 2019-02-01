@@ -1,0 +1,276 @@
+﻿@model Habufa_Extranet.Models.ViewModel.MenuGridViewModel
+@{
+    var jsonFields = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Headers);
+    var jsonRoles = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Roles);
+    var jsonItems = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Items);
+}
+
+<template id="AdminDataGrid">
+    <div>
+        <v-toolbar flat>
+            <v-dialog v-model="dialog"
+                      max-width="500px">
+                <v-btn slot="activator"
+                       color="primary"
+                       dark
+                       class="mb-2">
+                    New Item
+                </v-btn>
+
+                <v-card>
+                    <v-card-title>
+                        <span class="headline">
+                            {{ formTitle }}
+                        </span>
+                    </v-card-title>
+
+                    <v-card-text>
+                        <v-container grid-list-md>
+                            <v-layout wrap>
+                                <v-flex xs12
+                                        sm6
+                                        md4>
+                                    <v-text-field v-model="editedItem.MenuId"
+                                                  label="ID" readonly></v-text-field>
+                                </v-flex>
+                                <v-flex xs12
+                                        sm6
+                                        md4>
+                                    <v-text-field v-model="editedItem.MenuTitle"
+                                                  label="MenuTitle"></v-text-field>
+                                </v-flex>
+                                <v-flex xs12
+                                        sm6
+                                        md4>
+                                    <v-text-field v-model="editedItem.DisplayOrder"
+                                                  label="DisplayOrder" type="number"></v-text-field>
+                                </v-flex>
+                                <v-flex xs12
+                                        sm6
+                                        md4>
+                                    <v-text-field v-model="editedItem.MenuAction"
+                                                  label="MenuAction"></v-text-field>
+                                </v-flex>
+                                <v-flex xs12
+                                        sm6
+                                        md4>
+                                    <v-select :items="items"
+                                              item-text="MenuTitle"
+                                              item-value="MenuId"
+                                              v-model="editedItem.ParentId"
+                                              label="Parent">
+
+                                    </v-select>
+                                </v-flex>
+                                <v-flex xs12
+                                        sm6
+                                        md4>
+                                    <v-text-field v-model="editedItem.Icon"
+                                                  label="Icon"></v-text-field>
+                                </v-flex>
+                                <v-flex xs12
+                                        sm6
+                                        md4>
+                                    <v-select :items="roles"
+                                              v-model="editedItem.Role"
+                                              label="Role"></v-select>
+                                </v-flex>
+
+                            </v-layout>
+
+                        </v-container>
+                    </v-card-text>
+
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="blue darken-1"
+                               flat
+                               v-on:click="close">
+                            Cancel
+                        </v-btn>
+                        <v-btn color="blue darken-1"
+                               flat
+                               v-on:click="save">
+                            Save
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+        </v-toolbar>
+
+        <v-data-table :headers="headers"
+                      :items="items"
+                      :loading="loading"
+                      :rows-per-page-items="rowsPerPage"
+                      fixed
+                      app
+                      stateless>
+
+            <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
+
+            <template slot="items" slot-scope="props">
+                <row>
+                    <cell>{{ props.item.MenuTitle }}</cell>
+                    <cell>{{ props.item.DisplayOrder }}</cell>
+                    <cell>{{ props.item.MenuAction }}</cell>
+                    <cell>{{ props.item.ParentId }}</cell>
+                    <cell><v-icon small>{{ props.item.Icon }}</v-icon></cell>
+                    <cell>{{ props.item.Role }}</cell>
+                    <cell class="justify-center">
+                        <v-icon small class="mr-2"
+                                v-on:click="editItem(props.item)">
+                            edit
+                        </v-icon>
+                        <v-icon small
+                                v-on:click="deleteItem(props.item)">
+                            delete
+                        </v-icon>
+                    </cell>
+                </row>
+            </template>
+
+            <template slot="no-data">
+                <v-alert :value="!loading" color="error" icon="warning">
+                    Sorry, nothing to display here
+                </v-alert>
+            </template>
+        </v-data-table>
+    </div>
+</template>
+
+<script>
+    var dataGridMenu = Vue.component('admin-menu-datagrid',
+            {
+            template: '#AdminDataGrid',
+            data: function() {
+                return {
+                    dialog: false,
+                    loading: true,
+                    rowsPerPage:[10, 25, 50, { "text": "$vuetify.dataIterator.rowsPerPageAll", "value": -1 }],
+
+                    headers: @Html.Raw(jsonFields),
+                    items: [],
+                    roles: @Html.Raw(jsonRoles),
+                    pagination: {
+                        rowsPerPage: 25,
+                    },
+                    editedIndex: -1,
+                    editedItem: {
+                        MenuId: 0,
+                        MenuTitle: '',
+                        DisplayOrder: '',
+                        MenuAction: '',
+                        ParentId: 0,
+                        Icon: '',
+                        Role: '',
+                        Actions: ''
+                    },
+                    defaultItem: {
+                        MenuId: 0,
+                        MenuTitle: '',
+                        DisplayOrder: '',
+                        MenuAction: '',
+                        ParentId: 0,
+                        Icon: '',
+                        Role: '',
+                        Actions: ''
+                    }
+                }
+            },
+            computed: {
+                formTitle: function() {
+                    return this.editedIndex === -1 ? 'New Item' : 'Edit Item';
+                }
+            },
+            watch: {
+                dialog: function(val) {
+                    val || this.close();
+                }
+            },
+            mounted: function() {
+                this.initialize();
+            },
+            methods: {
+                initialize: function () {
+                    var self = this;
+                    self.loading = true;
+                    api({
+                        method: 'get',
+                        url: '/Admin/OnGetMenuItems'
+                    })
+                    .then( function(response){
+                        if (response) {
+                            self.items = response.data;
+                            console.log(self.items);
+                            self.loading = false;
+                        }
+                    });
+                },
+                toggleLoading: function() {
+                    this.loading = !this.loading;
+                },
+                editItem: function(item) {
+                    this.editedIndex = this.items.indexOf(item);
+                    this.editedItem = Object.assign({}, item);
+                    this.dialog = true;
+                },
+                deleteItem: function(item) {
+                    var index = this.items.indexOf(item);
+                    var r = confirm('Are you sure you want to delete this item?');
+                    if (r) {
+                        this.onDelete(item);
+                    }
+                },
+                close: function() {
+                    this.dialog = false;
+                },
+                save: function () {
+                    this.onSave(this.editedItem);
+                },
+                onSave: function (aitem) {
+                    console.log('saving',aitem);
+                    var self = this;
+                    api({
+                            method: 'post',
+                            url: '/Admin/OnSaveMenuItem',
+                            data: {
+                                "MenuId": aitem.MenuId,
+                                "MenuTitle": aitem.MenuTitle,
+                                "Icon": aitem.Icon,
+                                "MenuAction": aitem.MenuAction,
+                                "Role": aitem.Role,
+                                "DisplayOrder": aitem.DisplayOrder,
+                                "ParentId": aitem.ParentId
+                            }
+                        })
+                        .then( function(response) {
+                            if (response) {
+                                self.initialize();
+                                self.close();
+                            }
+                        })
+                        .catch(function(response) {
+                            console.log(response);
+                            return false;
+                        });
+
+                },
+                onDelete: function (aitem) {
+                    var self = this;
+                    api({
+                            method: 'post',
+                            url: '/Admin/OnDeleteMenuItem',
+                            data: {
+                                "MenuId": aitem.MenuId
+                            }
+                        })
+                        .then(function (response) {
+                            if (response) {
+                                self.initialize();
+                            }
+                        });
+                }
+            }
+
+        });
+</script>

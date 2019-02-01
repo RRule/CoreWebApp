@@ -1,0 +1,34 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<MyUser> _UserManager
+@{
+    var user = await _UserManager.GetUserAsync(User);
+}
+
+<div id="backgroundTasks"></div>
+
+<script>
+    var backgroundTasks = Vue.component('backgroundTasks',
+        {
+            template: '#backgroundTasks',
+            data: function () {
+                return {
+                    userId: '@user.Id'
+                }
+            },
+            methods: {
+                updateUserActivity: function() {
+                    api({
+                            method: 'post',
+                            url: '/Home/UpdateUserActivity',
+                            data: {
+                                "UserId": this.userId
+                            }
+                        })
+                        .then(response => {
+                            this.solution = response.data;
+                            return true;
+                        });
+                }
+            }
+        });
+</script>

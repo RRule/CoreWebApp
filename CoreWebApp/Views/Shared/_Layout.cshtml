@@ -26,50 +26,51 @@
     <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="~/lib/tinymce-vue/tinymce-vue.min.js"></script>
-    <body>
-        <div id="app" v-cloak>
-            <v-app id="inspire" :dark="isDark" class="grey lighten-5">
-                @* Layout *@
-                <comp-navigation ref="nav" :usercustomers="user.CustomerNumbers" :userconcepts="user.Concepts"></comp-navigation>
-                @* -Layout- *@
-                <div class="container">
-                    <main role="main" class="pb-3">
-                        @RenderBody()
-                    </main>
-                </div>
-                @* Notifications ETC *@
-                <v-snackbar v-model="snackbar.show"
-                            :color="snackbar.color"
-                            :bottom="snackbar.y === 'bottom'"
-                            :left="snackbar.x === 'left'"
-                            :multi-line="snackbar.mode === 'multi-line'"
-                            :right="snackbar.x === 'right'"
-                            :timeout="snackbar.timeout"
-                            :top="snackbar.y === 'top'"
-                            :vertical="snackbar.mode === 'vertical'">
-                    {{ snackbar.text }}
-                    <v-btn color="black"
-                           flat
-                           v-on:click="snackbar.show = false">
-                        X
-                    </v-btn>
-                </v-snackbar>
+</head>
+<body>
+    <div id="app" v-cloak>
+        <v-app id="inspire" :dark="isDark" class="grey lighten-5">
+            @* Layout *@
+            <comp-navigation ref="nav" :usercustomers="user.CustomerNumbers" :userconcepts="user.Concepts"></comp-navigation>
+            @* -Layout- *@
+            <div class="container">
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                </main>
+            </div>
+            @* Notifications ETC *@
+            <v-snackbar v-model="snackbar.show"
+                        :color="snackbar.color"
+                        :bottom="snackbar.y === 'bottom'"
+                        :left="snackbar.x === 'left'"
+                        :multi-line="snackbar.mode === 'multi-line'"
+                        :right="snackbar.x === 'right'"
+                        :timeout="snackbar.timeout"
+                        :top="snackbar.y === 'top'"
+                        :vertical="snackbar.mode === 'vertical'">
+                {{ snackbar.text }}
+                <v-btn color="black"
+                       flat
+                       v-on:click="snackbar.show = false">
+                    X
+                </v-btn>
+            </v-snackbar>
 
-                <footer class="border-top footer text-muted">
-                    <div class="container">
-                        &copy; 2018 - CoreWebApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                    </div>
-                </footer>
-            </v-app>
-        </div>
-        <script src="~/js/default.js"></script>
-        <!-- Components are loaded here: -->
-        @Html.Partial($"~/Views/Components/HelperOffset.cshtml")
-        @Html.Partial($"~/Views/Components/Navigation.cshtml")
-        @RenderSection("VueComponents", required: false)
-        <!-- #END -->
-        <script src="~/js/app.js"></script>
-        <script type="text/javascript">
+            <footer class="border-top footer text-muted">
+                <div class="container">
+                    &copy; 2018 - CoreWebApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                </div>
+            </footer>
+        </v-app>
+    </div>
+    <script src="~/js/default.js"></script>
+    <!-- Components are loaded here: -->
+    @Html.Partial($"~/Views/Components/HelperOffset.cshtml")
+    @Html.Partial($"~/Views/Components/Navigation.cshtml")
+    @RenderSection("VueComponents", required: false)
+    <!-- #END -->
+    <script src="~/js/app.js"></script>
+    <script type="text/javascript">
     var app = new Vue({
         data: {
             user: {
@@ -138,7 +139,7 @@
         }
     }).$mount('#app');
 
-        </script>
-        @RenderSection("Scripts", required: false)
-    </body>
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
 </html>

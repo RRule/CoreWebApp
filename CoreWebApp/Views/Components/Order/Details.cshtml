@@ -1,0 +1,83 @@
+﻿@model Habufa_Extranet.Controllers.OrderDetailPageViewModel
+@{
+    var jsonItems = Newtonsoft.Json.JsonConvert.SerializeObject(Model.OrderLines);
+}
+<template id="DataGridOrderLines">
+    <div>
+
+        <v-data-table :headers="headers"
+                      :items="items"
+                      :loading="loading"
+                      :rows-per-page-items="rowsPerPage"
+                      :search="search"
+                      :pagination.sync="pagination"
+                      class="elevation-1">
+            <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
+            <v-spacer></v-spacer>
+            <template slot="items" slot-scope="props">
+                <row>
+                    <cell><a href="/Product/View/">{{props.item.ProdId}}</a></cell>
+                    <cell>{{props.item.ProdDscr}}</cell>
+                    <cell>{{props.item.Quantity}}</cell>
+                    <cell>{{props.item.Price}} </cell>
+                    <cell>{{props.item.Discount}}%</cell>
+                    <cell>{{props.item.TotalPrice}} </cell>
+                </row>
+            </template>
+            <template slot="no-data">
+                <v-alert :value="!loading" color="error" icon="warning">
+                    Sorry, nothing to display here
+                </v-alert>
+            </template>
+            <template slot="footer">
+                <row>
+                    <cell></cell>
+                    <cell></cell>
+                    <cell></cell>
+                    <cell></cell>
+                    <cell>{{currency}}</cell>
+                    <cell>
+                        {{totalprice}}
+                    </cell>
+                </row>
+            </template>
+        </v-data-table>
+    </div>
+</template>
+
+<script>
+    var datagridorderlines = Vue.component('datagridorderlines',
+    {
+        template: '#DataGridOrderLines',
+        data: function () {
+            return {
+                loading: false,
+                search: '',
+                rowsPerPage: [99],
+                pagination: {
+                    sortBy: 'orderdate',
+                    descending: true
+                },
+                headers: [
+                    { text: 'Artikelnr', align: 'left', value: 'ProdId' },
+                    { text: 'Artikelomschrijving', value: 'ProdDscr' },
+                    { text: 'Aantal', value: 'Quantity' },
+                    { text: 'Stuksprijs', value: 'Price' },
+                    { text: 'Korting', value: 'Discount' },
+                    { text: 'Totaal', value: 'TotalPrice' }
+
+                ],
+                items: @Html.Raw(jsonItems),
+            }
+        },
+        props: {
+            currency: String,
+            totalprice: String
+
+        },
+        methods: {
+
+        }
+
+    });
+</script>

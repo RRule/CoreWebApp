@@ -1,0 +1,55 @@
+﻿<template id="helperOffset">
+    <div :style="styles"
+         :class="classes"
+         class="v-offset">
+        <slot />
+    </div>
+</template>
+
+<script>
+    Vue.component('helper-offset',
+        {
+            template: "#helperOffset",
+            props: {
+                fullWidth: {
+                    type: Boolean,
+                    default: false
+                },
+                offset: {
+                    type: [Number, String],
+                    default: 0
+                }
+            },
+
+            computed: {
+                classes: function () {
+                    return {
+                        'v-offset--full-width': this.fullWidth
+                    }
+                },
+                styles: function () {
+                    return {
+                        top: '-15px',
+                        marginBottom: '-15px'
+                    }
+                }
+            }
+        });
+</script>
+
+<style>
+
+    .v-card .v-offset .v-card--material__header.v-card {
+        padding: 15px;
+    }
+
+    .v-offset {
+        margin: 0 auto;
+        max-width: calc(100% - 32px);
+        position: relative;
+    }
+
+    .v-offset--full-width {
+        max-width: 100%;
+    }
+</style>

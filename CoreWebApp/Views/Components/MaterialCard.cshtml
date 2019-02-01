@@ -1,0 +1,90 @@
+﻿@*
+    CARD
+*@
+
+
+<template id="MaterialCard">
+    <v-card v-bind="$attrs"
+            :style="styles"
+            v-on="$listeners">
+
+        <helper-offset :inline="inline"
+                       :full-width="fullWidth"
+                       :offset="offset">
+
+            <v-card :color="color"
+                    class="v-card--material__header m-1"
+                    dark>
+                <h3 class="title font-weight-light mb-2"
+                    v-text="title"></h3>
+                <h4 class="text font-weight-light mb-2"
+                    v-text="text"></h4>
+            </v-card>
+        </helper-offset>
+
+        <!-- 3-->
+        <v-card-text>
+            <slot />
+        </v-card-text>
+
+
+    </v-card>
+</template>
+
+<script>
+    Vue.component('material-card',
+        {
+            template: "#MaterialCard",
+            inheritAttrs: false,
+            props: {
+                color: {
+                    type: String,
+                    default: 'secondary'
+                },
+                inline: {
+                    type: Boolean,
+                    default: false
+                },
+                fullWidth: {
+                    type: Boolean,
+                    default: false
+                },
+                offset: {
+                    type: [Number, String],
+                    default: 24
+                },
+                title: {
+                    type: String,
+                    default: undefined
+                },
+                text: {
+                    type: String,
+                    default: undefined
+                }
+            },
+
+            computed: {
+                hasOffset() {
+                    return this.$slots.header ||
+                        this.$slots.offset ||
+                        this.title ||
+                        this.text;
+                },
+                styles() {
+                    if (!this.hasOffset) return null
+
+                    return {
+                        marginBottom: `${this.offset}px`,
+                        marginTop: `${this.offset * 2}px`
+                    }
+                }
+            }
+        });
+</script>
+
+<style>
+
+    .v-card--material .header .v-card {
+        border-radius: 4px;
+    }
+</style>

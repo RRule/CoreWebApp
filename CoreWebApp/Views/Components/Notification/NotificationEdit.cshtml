@@ -1,0 +1,221 @@
+﻿@using System.Threading.Tasks
+@model Habufa_Extranet.Data.NotificationViewModel
+
+
+<template id="NotificationCreate">
+    <v-form>
+        <v-container>
+
+            <h1>{{header}}</h1>
+            <v-dialog v-model="loader"
+                      hide-overlay
+                      persistent
+                      width="300">
+                <v-card color="primary"
+                        dark>
+                    <v-card-text>
+                        Saving
+                        <v-progress-linear indeterminate
+                                           color="white"
+                                           class="mb-0"></v-progress-linear>
+                    </v-card-text>
+                </v-card>
+            </v-dialog>
+            <v-layout row wrap>
+                <v-flex xs12 sm12 md12>
+                    <v-text-field label="Name" v-model="notification.Name">
+                    </v-text-field>
+                </v-flex>
+            </v-layout>
+            <v-layout row>
+                <v-flex sm12 md6>
+                    <v-menu :close-on-content-click="false"
+                            v-model="menu"
+                            :nudge-right="40"
+                            lazy
+                            transition="scale-transition"
+                            offset-y
+                            full-width
+                            min-width="290px">
+                        <v-text-field slot="activator"
+                                      v-model="notification.StartDate"
+                                      label="Start date"
+                                      prepend-icon="event"
+                                      readonly></v-text-field>
+                        <v-date-picker v-model="notification.StartDate" v-on:input="menu = false"></v-date-picker>
+                    </v-menu>
+                </v-flex>
+                <v-flex sm12 md6>
+                    <v-menu :close-on-content-click="false"
+                            v-model="menu2"
+                            :nudge-right="40"
+                            lazy
+                            transition="scale-transition"
+                            offset-y
+                            full-width
+                            min-width="290px">
+                        <v-text-field slot="activator"
+                                      v-model="notification.EndDate"
+                                      label="End date"
+                                      prepend-icon="event"
+                                      readonly></v-text-field>
+                        <v-date-picker v-model="notification.EndDate" v-on:input="menu2 = false"></v-date-picker>
+                    </v-menu>
+                </v-flex>
+            </v-layout>
+            <v-layout row>
+                <v-flex xs6 sm6 md6>
+
+                    <v-select :items="['H&H','Xooon','CocoMaison','H@H','Habufa']"
+                              v-model="notification.Concept"
+                              label="Concept"></v-select>
+
+                </v-flex>
+                <v-flex xs12 sm6 md6>
+                    <p>{{ notification.Country || 'Pick a country' }}</p>
+
+                    <v-radio-group v-model="notification.Country" :mandatory="true">
+                        <v-radio label="België" value="BE"></v-radio>
+                        <v-radio label="Duitsland" value="DE"></v-radio>
+                        <v-radio label="Frankrijk" value="FR"></v-radio>
+                        <v-radio label="Luxemburg" value="LU"></v-radio>
+                        <v-radio label="Nederland" value="NL"></v-radio>
+                        <v-radio label="Oostenrijk" value="AU"></v-radio>
+                        <v-radio label="Zwitserland" value="CH"></v-radio>
+                    </v-radio-group>
+                </v-flex>
+
+            </v-layout>
+            <v-layout row wrap>
+                <v-flex xs12 sm6 md4>
+                    <v-textarea name="input-7-1"
+                                label="Message NL"
+                                v-model="notification.MessageNL"
+                                hint=""></v-textarea>
+                </v-flex>
+                <v-flex xs12 sm6 md4>
+                    <v-textarea name="input-7-1"
+                                label="Message EN"
+                                v-model="notification.MessageEN"
+                                hint=""></v-textarea>
+                </v-flex>
+                <v-flex xs12 sm6 md4>
+                    <v-textarea name="input-7-1"
+                                label="Message FR"
+                                v-model="notification.MessageFR"
+                                hint=""></v-textarea>
+                </v-flex>
+                <v-flex xs12 sm6 md4>
+                    <v-textarea name="input-7-1"
+                                label="Message DE"
+                                v-model="notification.MessageDE"
+                                hint=""></v-textarea>
+                </v-flex>
+            </v-layout>
+            <v-layout row wrap>
+                <v-flex left>
+                    <v-btn dark color="deep-orange darken-3">Delete</v-btn>
+                </v-flex>
+                <v-flex right>
+                    <v-btn color="danger">Preview</v-btn>
+                    <v-btn color="danger">Send</v-btn>
+                    <v-btn color="green accent-1" :disabled="!formIsValid" v-on:click="save()">Save</v-btn>
+
+                </v-flex>
+            </v-layout>
+        </v-container>
+    </v-form>
+</template>
+
+<script>
+    var NotificationCreate = Vue.component('notification-create',
+        {
+            template: '#NotificationCreate',
+            data: function () {
+                return {
+                    menu: false,
+                    menu2: false,
+
+                    notification: {
+                        Id: @Model.Id,
+                        Concept: '@Model.Concept',
+                        Country: '@Model.Country',
+                        Name: '@Model.Name',
+                        MessageNL: '@Model.MessageNL',
+                        MessageEN: '@Model.MessageEN',
+                        MessageFR: '@Model.MessageFR',
+                        MessageDE: '@Model.MessageDE',
+                        TitleNL: '@Model.TitleNL',
+                        TitleEN: '@Model.TitleEN',
+                        TitleFR: '@Model.TitleFR',
+                        TitleDE: '@Model.TitleDE',
+                        StartDate: '@Model.StartDate',
+                        EndDate: '@Model.EndDate'
+                    },
+                    loader: false
+                }
+            },
+            computed: {
+                formIsValid: function () {
+                    return (
+                        this.notification.Concept &&
+                            this.notification.Country);
+                },
+                header: function(){
+                    if (this.notification.Id == 0) {
+                        return "Create a notification";
+                    }
+                    return "Edit a notification";
+                }
+            },
+            mounted: function () {
+            },
+            methods: {
+                save: function () {
+                    console.log(this.notification);
+                    this.saveNotification(this.notification);
+                },
+                saveNotification: function (anotification) {
+
+                    var self = this;
+                    console.log(anotification,"self>",self.notification);
+
+                    api({
+                        method: 'post',
+                        url: '/Notification/OnSaveNotification',
+                        data: {
+                            Id: anotification.Id,
+                            Concept: anotification.Concept,
+                            Country: anotification.Country,
+                            Name: anotification.Name,
+                            MessageNL: anotification.MessageNL,
+                            MessageEN: anotification.MessageEN,
+                            MessageFR: anotification.MessageFR,
+                            MessageDE: anotification.MessageDE,
+                            TitleNL: anotification.TitleNL,
+                            TitleEN: anotification.TitleEN,
+                            TitleDE: anotification.TitleDE,
+                            TitleFR: anotification.TitleFR,
+                            Style: anotification.Style,
+                            StartDate: anotification.StartDate,
+                            EndDate: anotification.EndDate
+
+                        }
+                    })
+                        .then(function (response) {
+                            if (response) {
+                                console.log("success",response);
+                                self.notification.Id = response.data;
+                                app.showSnackbar('success', 'Saved succesfully!');
+                                window.location.href = "/Notification/Edit/" + self.notification.Id;
+
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }
+
+            }
+        });
+</script>

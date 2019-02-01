@@ -1,0 +1,92 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.SqlServer.Server
+@model DataGridViewModel
+@{
+    var jsonFields = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Headers);
+    var jsonItems = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Items);
+    bool isEditor = User.IsInRole("Admin");
+}
+
+<template id="DataGridNewsletters">
+    <div>
+        <v-text-field v-model="search"
+                      append-icon="search"
+                      label="Search"
+                      single-line
+                      hide-details></v-text-field>
+
+        <v-data-table :headers="headers"
+                      :items="items"
+                      :loading="loading"
+                      :rows-per-page-items="rowsPerPage"
+                      :search="search"
+                      class="elevation-1">
+            <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
+            <v-spacer></v-spacer>
+            <template slot="items" slot-scope="props">
+                <row>
+                    <cell>{{props.item.WeekNumber}}</cell>
+                    <cell>{{props.item.Title}}</cell>
+                    <cell>{{props.item.Concept}}</cell>
+                    <cell>{{props.item.Country}}</cell>
+                    <cell>{{props.item.Language}}</cell>
+                    <cell>{{props.item.State}}</cell>
+                    <cell class="justify-center">
+
+                        <v-btn flat icon v-on:click="openNewsletter(props.item.Id)">
+                            <v-icon small>
+                                fa-eye
+                            </v-icon>
+                        </v-btn>
+                        @if (isEditor)
+                        {
+                            <v-btn flat icon v-on:click="editNewsletter(props.item.Id)">
+                                <v-icon small>
+                                    fa-edit
+                                </v-icon>
+                            </v-btn>
+                        }
+                    </cell>
+                </row>
+            </template>
+            <template slot="no-data">
+                <v-alert :value="!loading" color="error" icon="warning">
+                    Sorry, nothing to display here
+                </v-alert>
+            </template>
+        </v-data-table>
+    </div>
+</template>
+
+<script>
+var dataGridDemo = Vue.component('datagridnewsletters',
+    {
+        template: '#DataGridNewsletters',
+        data: function () {
+            return {
+                loading: false,
+                search: '',
+                rowsPerPage:[10, 25, 50, { "text": "$vuetify.dataIterator.rowsPerPageAll", "value": -1 }],
+                headers:  [
+                    {text: 'Week Number', align: 'left', value: 'WeekNumber'},
+                    { text: 'Title', value: 'Title' },
+                    { text: 'Concept', value: 'Concept' },
+                    { text: 'Country', value: 'Country' },
+                    { text: 'Language', value: 'Language' },
+                    { text: 'State', value: 'State' },
+                    { text: 'Actions', value: '' }
+                ],
+                items: @Html.Raw(jsonItems),
+            }
+        },
+        methods: {
+            openNewsletter: function (id) {
+                window.location.href = "/Newsletter/View/"+id;
+            },
+            editNewsletter: function (id) {
+                window.location.href = "/Newsletter/Edit/"+id;
+            }
+        }
+
+    });
+</script>

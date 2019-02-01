@@ -1,0 +1,92 @@
+﻿@model Habufa_Extranet.Controllers.OrderPageViewModel
+@{
+    var jsonItems = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Items);
+}
+<template id="DataGridOrders">
+    <div>
+        <v-toolbar flat color="white">
+            <v-spacer></v-spacer>
+            <v-text-field v-model="search"
+                          append-icon="search"
+                          label="Search"
+                          single-line
+                          hide-details></v-text-field>
+        </v-toolbar>
+
+
+        <v-data-table :headers="headers"
+                      :items="items"
+                      :loading="loading"
+                      :rows-per-page-items="rowsPerPage"
+                      :search="search"
+                      :pagination.sync="pagination"
+                      class="elevation-1">
+            <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
+            <v-spacer></v-spacer>
+            <template slot="items" slot-scope="props">
+                <row>
+                    <cell v-on:click="openDetails(props.item.Id)">{{props.item.Id}}</cell>
+                    <cell>{{props.item.OrderDate}}</cell>
+                    <cell>{{props.item.ConfirmationDate}}</cell>
+                    <cell>{{props.item.OrderNumber}}</cell>
+                    <cell>{{props.item.CommissionName}}</cell>
+                    <cell>{{props.item.Status}}</cell>
+                    <cell>--</cell>
+                    <cell>{{props.item.PartialDeliveryAllowed}}</cell>
+                    <cell text-align="right">{{props.item.Price}} {{props.item.Currency}}</cell>
+                    <cell>
+                        <v-btn flat icon v-on:click="openDetails(props.item.Id)">
+                            <v-icon small>
+                                fa-eye
+                            </v-icon>
+                        </v-btn>
+                    </cell>
+
+                </row>
+            </template>
+            <template slot="no-data">
+                <v-alert :value="!loading" color="error" icon="warning">
+                    Sorry, nothing to display here
+                </v-alert>
+            </template>
+        </v-data-table>
+    </div>
+</template>
+
+<script>
+var dataGridOrders = Vue.component('datagridorders',
+    {
+        template: '#DataGridOrders',
+        data: function () {
+            return {
+                loading: false,
+                search: '',
+                rowsPerPage: [10, 25, 50, { "text": "$vuetify.dataIterator.rowsPerPageAll", "value": -1 }],
+                pagination: {
+                    sortBy: 'orderdate',
+                    descending: true
+                },
+                headers: [
+                    { text: 'Id', align: 'left', value: 'Id' },
+                    { text: 'Order Date', value: 'OrderDate' },
+                    { text: 'Confirmed', value: 'ConfirmationDate' },
+                    { text: 'OrderNmr', value: 'OrderNumber' },
+                    { text: 'Reference', value: 'CommissionName' },
+                    { text: 'Status', value: 'Status' },
+                    { text: 'Type', value: 'type' },
+                    { text: 'Delivery', value: 'PartialDeliveryAllowed' },
+                    { text: 'Price', value: 'Price' },
+                    { text: '', value: ''}
+
+                ],
+                items: @Html.Raw(jsonItems),
+            }
+        },
+        methods: {
+            openDetails: function (id) {
+                window.location.href = "/Order/Details/"+id;
+            }
+        }
+
+    });
+</script>
