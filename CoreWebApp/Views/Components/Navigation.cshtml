@@ -1,0 +1,256 @@
+﻿@using Microsoft.AspNetCore.Identity
+@*@inject IMenuItemRepository MenuManager
+    @inject UserManager<MyUser> _UserManager*@
+@*@{
+        var user = await _UserManager.GetUserAsync(User);
+        var jsonSideBarItems = Newtonsoft.Json.JsonConvert.SerializeObject(MenuManager.GetSideBarMenu().ToList());
+    }*@
+<template id="navigation">
+    <div id="navigation-container">
+        @* Drawer  *@
+        <v-navigation-drawer :clipped="drawer.clipped"
+                             :fixed="drawer.fixed"
+                             :permanent="drawer.permanent"
+                             :mini-variant="drawer.mini"
+                             v-model="drawer.open"
+                             color="blue-grey"
+                             fixed
+                             app>
+
+            <v-list class="pa-1">
+                <v-list-tile avatar tag="div" href="/Identity/Account/Manage">
+                    <v-list-tile-avatar>
+                        <img src="/images/avatars/user.jpg" />
+                    </v-list-tile-avatar>
+
+                    <v-list-tile-content>
+                        <v-list-tile-title>@*@user.FirstName @user.LastName*@</v-list-tile-title>
+                    </v-list-tile-content>
+                </v-list-tile>
+            </v-list>
+            <v-list class="">
+                <div v-if="userconcepts != '' ">
+
+                    <v-list-tile>
+                        <v-list-tile-content>
+                            <v-select :items="usercustomers"
+                                      :menu-props="{ maxHeight: '400' }"
+                                      v-model="activeCustNum"
+                                      item-value="CustomerId"
+                                      class=""
+                                      label="Active Dealer">
+                                <template slot="selection" slot-scope="data">
+                                    <div class="body-1 text-capitalize text-truncate font-weight-thin">
+                                        {{ data.item.CustomerId }}, {{ data.item.Name1 }}
+                                    </div>
+                                </template>
+                                <template slot="item" slot-scope="data">
+                                    <v-list-tile-content>
+                                        <v-list-tile-title v-html="`${data.item.CustomerId}, ${data.item.Name1}`">
+                                        </v-list-tile-title>
+                                    </v-list-tile-content>
+                                </template>
+                            </v-select>
+                        </v-list-tile-content>
+                    </v-list-tile>
+                    <v-chip small v-for="concept in userconcepts.split(',')">
+                        <v-avatar>
+                            <img :src="getSmallImage(concept)" style="height:12px; width:12px;">
+                        </v-avatar>
+                        {{concept}}
+                    </v-chip>
+                </div>
+            </v-list>
+            <v-list class="pt-0">
+                <div class="item" v-for="item in items"
+                     :key="item.MenuTitle">
+
+                    <v-list-tile v-if="item.Menus.length === 0 " :href="item.MenuAction">
+                        <v-list-tile slot="activator">
+                            <v-list-tile-title>{{item.MenuTitle}}</v-list-tile-title>
+                        </v-list-tile>
+
+                        <v-list-tile-action v-if="item.Icon">
+                            <v-icon :size="iconsize">{{ item.Icon }}</v-icon>
+                        </v-list-tile-action>
+
+                        <v-list-tile-content>
+                            <v-list-tile-title> {{ item.MenuTitle }}</v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+
+                    <v-list-group v-if="item.Menus.length">
+
+                        <v-list-tile slot="activator">
+                            <v-list-tile-title>
+                                {{item.MenuTitle}}
+                            </v-list-tile-title>
+                        </v-list-tile>
+
+                        <v-list-tile :href="subitem.MenuAction"
+                                     class=""
+                                     v-for="(subitem, i) in item.Menus"
+                                     :key="i">
+                            <v-list-tile-action>
+                                <v-icon :size="iconsize" text="subitem.MenuTitle">{{subitem.Icon}}</v-icon>
+                            </v-list-tile-action>
+                            <v-list-tile-title>{{subitem.MenuTitle}}</v-list-tile-title>
+                        </v-list-tile>
+
+                    </v-list-group>
+                </div>
+            </v-list>
+        </v-navigation-drawer>
+        @* End Side Drawer *@
+
+        @* Top Navigation *@
+        <v-toolbar fixed app>
+            <v-toolbar-side-icon v-on:click.stop="drawer.open = !drawer.open"></v-toolbar-side-icon>
+            <v-toolbar-title href="/">
+                <a href="/">
+                    <img src="~/images/logos/logo_habufa.png" style="max-height: 35px;" />
+                </a>
+            </v-toolbar-title>
+            <v-spacer></v-spacer>
+
+            <v-btn flat icon v-on:click="addShoppingCart">
+                <v-badge left>
+                    <span slot="badge">{{shoppingCartItems}}</span>
+                    <v-icon>shopping_cart</v-icon>
+                </v-badge>
+            </v-btn>
+            <v-menu offset-y>
+
+                <v-btn icon flat
+                       slot="activator">
+                    <v-icon>account_circle</v-icon>
+                </v-btn>
+                <v-list>
+                    <v-list-tile href="/Identity/Account/Manage" flat>
+                        Profile
+                    </v-list-tile>
+                    <v-list-tile v-on:click="logout" flat>
+                        Logout
+                    </v-list-tile>
+                </v-list>
+            </v-menu>
+
+            <v-toolbar-items class="hidden-sm-and-down">
+                <v-btn flat>Settings</v-btn>
+
+
+
+            </v-toolbar-items>
+        </v-toolbar>
+        @* End Top nav *@
+
+        <form id="logout" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new {area = ""})"></form>
+    </div>
+</template>
+
+<script>
+    var sideBar = Vue.component('comp-navigation',
+        {
+            template: '#navigation',
+            data: function () {
+                return {
+                    iconsize: 12,
+                    drawer: {
+                        open: getCookie("drawer"),
+                        clipped: false,
+                        fixed: true,
+                        permanent: false,
+                        mini: false
+                    },
+                    right: null,
+                    items: {},
+                    activeCustNum: {
+                        CustomerId: ''
+                    },
+                    shoppingCartItems: 1
+                }
+            },
+            props: {
+                usercustomers: Array,
+                userconcepts: String,
+            },
+            computed: {
+                selectedCustomer: function () {
+                    return this.usercustomers.find(cust => cust.CustomerId === this.activeCustNum);
+                }
+            },
+            methods: {
+                addShoppingCart: function () {
+                    this.shoppingCartItems = this.shoppingCartItems + 1;
+                },
+                logout: function () {
+                    document.getElementById("logout").submit();
+                },
+                updateActiveCustomer: function (val) {
+                    console.log(val);
+                    var self = this;
+                    api({
+                        method: 'post',
+                        url: '/Secure/UpdateActiveCustomer',
+                        data: {
+                            customerNumber: val
+                        }
+                    })
+                        .then(function (response) {
+                            if (response.data) {
+                                setCookie("activeCustomerNumber", response.data, 1);
+                                location.reload();
+                            }
+                        })
+                        .catch(function (error) {
+                            app.showSnackbar('red', error);
+
+                        });
+                },
+                updateUserActivity: function () {
+                    api({
+                        method: 'get',
+                        url: '/Secure/UpdateUserActivity'
+                    })
+                        .then(function (response) {
+                        })
+                        .catch(function (error) {
+                            app.showSnackbar('red', error);
+                        });
+                },
+                activate: function () {
+                    var that = this;
+                    setTimeout(function () {
+                        that.updateUserActivity();
+                    }, 1500);
+                },
+                getSmallImage: function (concept) {
+                    if (concept == 'H&H') {
+                        return '/images/logos/sm_HandH.png';
+                    }
+                    if (concept == 'H@H') {
+                        return '/images/logos/sm_HatH.png';
+                    }
+                    if (concept == 'XOOON') {
+                        return '/images/logos/sm_Xooon.png';
+                    }
+                    if (concept == 'COCO') {
+                        return '/images/logos/CocoMaison.jpg';
+                    }
+                    return '';
+                }
+            },
+            watch: {
+                activeCustNum: function (val) {
+                    this.updateActiveCustomer(val);
+                },
+                'drawer.open': function (val) {
+                    setCookie("drawer", val, 1);
+                },
+            },
+            mounted: function () {
+                console.log(document.cookie);
+                this.activate();
+            }
+        });
+</script>
