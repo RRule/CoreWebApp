@@ -1,0 +1,65 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<template id="TinyMceEditor">
+    <v-text-field id="tinymce-editor"
+                  :value="value"
+                  class="form-control textarea-editor"
+                  ref="icontent">
+
+    </v-text-field>
+</template>
+
+<script>
+    var tinymcevue = Vue.component('tinymce-editor',
+        {
+            template: '#TinyMceEditor',
+            data: function () {
+                return {
+                }
+            },
+            props: {
+
+                value: {
+                    type: String,
+                    default: ''
+                },
+                content: {
+                    type: String,
+                    default: ''
+                }
+            },
+            mounted: function () {
+                this.initialize();
+            },
+            methods: {
+                initialize: function () {
+                    var self = this;
+                    tinymce.init({
+                        selector: '#tinymce-editor', // change this value according to your HTML
+                        branding: false,
+                        menubar: false,
+                        height: "480",
+                        paste_as_text: true,
+                        entity_encoding: "named",
+                        plugins: tinyMCEPlugins,
+                        toolbar1: tinyMCEToolbar1,
+                        toolbar2: tinyMCEToolbar2,
+
+                        forced_root_block: 'p',
+                        init_instance_callback: function (editor) {
+                            this.on('change', function (e) {
+                                self.updateValue(e.level.content);
+                            });
+                            this.on('keyup', function (e) {
+                                self.updateValue(e.srcElement.innerHTML);
+                            });
+                        }
+                    });
+                },
+                updateValue: function (e) {
+                    this.$emit('input', e);
+                }
+            }
+        });
+</script>

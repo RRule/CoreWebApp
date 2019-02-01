@@ -1,0 +1,96 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.SqlServer.Server
+@model DataGridViewModel
+@{
+    var jsonFields = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Headers);
+    var jsonItems = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Items);
+    bool isEditor = User.IsInRole("Admin");
+}
+
+<template id="DataGridNotification">
+    <div>
+        <v-text-field v-model="search"
+                      append-icon="search"
+                      label="Search"
+                      single-line
+                      hide-details></v-text-field>
+
+        <v-data-table :headers="headers"
+                      :items="items"
+                      :loading="loading"
+                      :rows-per-page-items="rowsPerPage"
+                      :search="search"
+                      class="elevation-1">
+            <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
+            <v-spacer></v-spacer>
+            <template slot="items" slot-scope="props">
+                <row>
+                    <cell>{{props.item.Name}}</cell>
+
+                    <cell>{{props.item.Concept}}</cell>
+                    <cell>{{props.item.StartDate}}</cell>
+                    <cell>{{props.item.EndDate}}</cell>
+                    <cell>{{props.item.Country}}</cell>
+                    <cell>{{props.item.Language}}</cell>
+                    <cell class="justify-center">
+                        @if (isEditor)
+                        {
+                            <v-btn flat icon v-on:click="editNotification(props.item.Id)">
+                                <v-icon small>
+                                    fa-edit
+                                </v-icon>
+                            </v-btn>
+                        }
+                    </cell>
+                </row>
+            </template>
+            <template slot="no-data">
+                <v-alert :value="!loading" color="error" icon="warning">
+                    Sorry, nothing to display here
+                </v-alert>
+            </template>
+        </v-data-table>
+    </div>
+</template>
+
+<script>
+    var dataGridDemo = Vue.component('datagridnotification',
+    {
+        template: '#DataGridNotification',
+        data: function () {
+            return {
+                loading: false,
+                search: '',
+                rowsPerPage:[10, 25, 50, { "text": "$vuetify.dataIterator.rowsPerPageAll", "value": -1 }],
+                headers:  [
+                    { text: 'name', align: 'left', value: 'name'},
+                    { text: 'concept', value: 'concept' },
+                    { text: 'StartDate', value: 'StartDate' },
+                    { text: 'EndDate', value: 'EndDate' },
+                    { text: 'Language', value: 'Language' },
+                    { text: 'Country', value: 'Country' },
+                    { text: 'Actions', value: '' }
+                ],
+                items: @Html.Raw(jsonItems),
+                customFilter: {
+                    type: Function,
+                    default: (items, search, filter) => {
+                        search = search.toString().toLowerCase()
+                        return items.filter(i => (
+                            Object.keys(i).some(j => filter(i[j], search))
+                        ))
+                    }
+                },
+            }
+        },
+        methods: {
+            openNotification: function (id) {
+                window.location.href = "/Notification/View/"+id;
+            },
+            editNotification: function (id) {
+                window.location.href = "/Notification/Edit/"+id;
+            }
+        }
+
+    });
+</script>

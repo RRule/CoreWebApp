@@ -1,0 +1,177 @@
+﻿@model Habufa_Extranet.Data.Newsletter
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<template id="NewsletterCreate">
+    <v-form>
+        <v-container>
+
+            <h1>{{header}}</h1>
+            <v-dialog v-model="loader"
+                      hide-overlay
+                      persistent
+                      width="300">
+                <v-card color="primary"
+                        dark>
+                    <v-card-text>
+                        Saving
+                        <v-progress-linear indeterminate
+                                           color="white"
+                                           class="mb-0"></v-progress-linear>
+                    </v-card-text>
+                </v-card>
+            </v-dialog>
+
+
+            <v-layout row wrap>
+                <v-flex xs12 sm12 md12>
+                    <v-text-field label="Titel" v-model="newsletter.Title">
+                    </v-text-field>
+                </v-flex>
+            </v-layout>
+
+            <v-layout row wrap>
+                <v-flex xs12 sm6 md6>
+                    <v-text-field label="Weeknummer" mask="####-##" v-model="newsletter.Week">
+                    </v-text-field>
+                </v-flex>
+                <v-flex xs12 sm6 md6>
+                    <v-select :items="['Draft','Online']"
+                              v-model="newsletter.Status"
+                              label="Status"></v-select>
+                </v-flex>
+            </v-layout>
+
+            <v-layout row wrap>
+                <v-flex xs12 sm6 md6>
+                    <v-text-field label="Web rol" v-model="newsletter.Role">
+                    </v-text-field>
+                </v-flex>
+                <v-flex xs12 sm6 md6>
+                    <v-text-field label="Datum laatst verzonden" v-model="newsletter.DateSent">
+                    </v-text-field>
+                </v-flex>
+            </v-layout>
+
+            <v-layout row>
+
+                <v-flex xs6 sm6 md6>
+                    <v-select :items="['NL']"
+                              v-model="newsletter.Country"
+                              label="Land"></v-select>
+                </v-flex>
+                <v-flex xs6 sm6 md6>
+
+                    <v-select :items="['NL','DE','FR','EN']"
+                              v-model="newsletter.Language"
+                              label="Taal"></v-select>
+                </v-flex>
+                <v-flex xs6 sm6 md6>
+
+                    <v-select :items="['H&H','Xooon','CocoMaison','H@H','Habufa']"
+                              v-model="newsletter.Concept"
+                              label="Concept"></v-select>
+                </v-flex>
+            </v-layout>
+
+            <v-layout row wrap>
+                <v-flex xs12 sm12 md12>
+                    <tinymce-editor v-model="newsletter.Content"></tinymce-editor>
+                </v-flex>
+            </v-layout>
+            <v-layout row wrap>
+                <v-flex left>
+                    <v-btn dark color="deep-orange darken-3">Delete</v-btn>
+                </v-flex>
+                <v-flex right>
+                    <v-btn color="danger">Preview</v-btn>
+                    <v-btn color="danger">Send</v-btn>
+                    <v-btn color="green accent-1" :disabled="!formIsValid" v-on:click="save()">Save</v-btn>
+
+                </v-flex>
+            </v-layout>
+        </v-container>
+    </v-form>
+</template>
+
+<script>
+    var newsletterCreate = Vue.component('newsletter-create',
+        {
+            template: '#NewsletterCreate',
+            data: function () {
+                return {
+                    newsletter: {
+                        Id: @Model.Id,
+                        Concept: '@Html.Raw(Model.Concept)',
+                        Country: '@Model.Country',
+                        Language: '@Model.Language',
+                        Status: '@Model.State',
+                        Title: '@Html.Raw(Model.Title)',
+                        Week: '@Model.WeekNumber',
+                        DateSent: '@Model.LastSentDate',
+                        Role: '@Model.Role',
+                        Content: "@Html.Raw(Model.Content)"
+                    },
+                    loader: false
+                }
+            },
+            computed: {
+                formIsValid: function () {
+                    return (
+                        this.newsletter.Week &&
+                        this.newsletter.Content &&
+                        this.newsletter.Language &&
+                        this.newsletter.Country &&
+                        this.newsletter.Concept &&
+                        this.newsletter.Title);
+                },
+                header: function(){
+                    if (this.newsletter.Id == 0) {
+                        return "Create a newsletter";
+                    }
+                    return "Edit a newsletter";
+                }
+            },
+            mounted: function () {
+            },
+            methods: {
+                save: function () {
+                    this.saveNewsletter(this.newsletter);
+                },
+                saveNewsletter: function (anewsletter) {
+                    var self = this;
+                    api({
+                        method: 'post',
+                        url: '/Newsletter/OnSaveNewsletter',
+                        data: {
+                            Id: anewsletter.Id,
+                            LastUpdated: '',
+                            Concept: anewsletter.Concept,
+                            Country: anewsletter.Country,
+                            Language: anewsletter.Language,
+                            State: anewsletter.Status,
+                            Title: anewsletter.Title,
+                            WeekNumber: anewsletter.Week,
+                            LastSentDate: anewsletter.DateSent,
+                            Role: anewsletter.Role,
+                            Content: anewsletter.Content
+                        }
+                    })
+                        .then(function (response) {
+                            if (response) {
+                                console.log("success",response);
+                                self.newsletter.Id = response.data;
+                                app.showSnackbar('success', 'Saved succesfully!');
+                                window.location.href = "/Newsletter/Edit/" + self.newsletter.Id;
+
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }
+
+            }
+        });
+</script>

@@ -1,0 +1,301 @@
+﻿@using System.Threading.Tasks
+@model Habufa_Extranet.Models.ViewModel.GridUserViewModel
+
+@{
+    var jsonFields = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Headers);
+    var jsonItems = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Users);
+    var jsonRoles = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Roles);
+    var jsonCustomers = Newtonsoft.Json.JsonConvert.SerializeObject(Model.CustomerNumbers);
+}
+
+
+<template id="AdminUsersDataGrid">
+    <div>
+        <v-toolbar flat>
+            <v-dialog v-model="dialog"
+                      max-width="500px">
+                <v-card>
+                    <v-card-title>
+                        <span class="headline">
+                            {{ formTitle }}
+                        </span>
+                    </v-card-title>
+
+                    <v-card-text>
+                        <v-container grid-list-md>
+                            <v-layout wrap>
+
+                                <v-flex xs12
+                                        sm6
+                                        md4>
+                                    <v-text-field v-model="editedItem.FirstName"
+                                                  label="FirstName"></v-text-field>
+                                </v-flex>
+
+                                <v-flex xs12
+                                        sm6
+                                        md4>
+                                    <v-text-field v-model="editedItem.LastName"
+                                                  label="LastName"></v-text-field>
+                                </v-flex>
+
+                                <v-flex xs12
+                                        sm6
+                                        md4>
+                                    <v-text-field v-model="editedItem.PhoneNumber"
+                                                  label="PhoneNumber"></v-text-field>
+                                </v-flex>
+
+                                <v-flex xs12
+                                        sm6
+                                        md4>
+                                    <v-text-field v-model="editedItem.CellPhoneNumber"
+                                                  label="CellPhoneNumber"></v-text-field>
+                                </v-flex>
+
+                                <v-flex xs12
+                                        sm6
+                                        md4>
+                                    <v-text-field v-model="editedItem.UserName"
+                                                  label="UserName"></v-text-field>
+                                </v-flex>
+
+                                <v-flex xs12
+                                        sm6
+                                        md4>
+                                    <v-text-field v-model="editedItem.Email"
+                                                  label="Email"></v-text-field>
+                                </v-flex>
+                                <v-flex md12 sm12 xs12>
+                                    <v-autocomplete v-model="editedItem.Roles"
+                                                    :items="roles"
+                                                    box
+                                                    chips
+                                                    color="blue"
+                                                    background-color="white"
+                                                    label="Select"
+                                                    item-text="Roles"
+                                                    item-value="Roles"
+                                                    multiple>
+                                        @* 000 *@
+                                        <template slot="selection"
+                                                  slot-scope="data">
+                                            <v-chip :selected="data.selected"
+                                                    close
+                                                    class="chip--select-multi"
+                                                    v-on:input="removeCustNum(data.item)">
+                                                {{ data.item }}
+                                            </v-chip>
+                                        </template>
+                                        <template slot="item"
+                                                  slot-scope="data">
+                                            <template v-if="typeof data.item !== 'object'">
+                                                <v-list-tile-content v-text="data.item"></v-list-tile-content>
+                                            </template>
+                                            <template v-else>
+                                                <v-list-tile-content>
+                                                    <v-list-tile-title v-html="data.item"></v-list-tile-title>
+                                                    <v-list-tile-sub-title v-html="data.item"></v-list-tile-sub-title>
+                                                </v-list-tile-content>
+                                            </template>
+                                        </template>
+                                        @* 000 *@
+                                    </v-autocomplete>
+                                </v-flex>
+
+                                <v-flex md12 sm12 xs12>
+                                    <v-autocomplete v-model="editedItem.CustomerNumbers"
+                                                    :items="customerNumbersArray"
+                                                    box
+                                                    chips
+                                                    color="blue"
+                                                    background-color="white"
+                                                    label="Select"
+                                                    item-text="CustomerNumbers"
+                                                    item-value="CustomerNumbers"
+                                                    multiple>
+                                        <template slot="selection"
+                                                  slot-scope="data">
+                                            <v-chip :selected="data.selected"
+                                                    close
+                                                    class="chip--select-multi"
+                                                    v-on:input="removeCustNum(data.item)">
+                                                {{ data.item }}
+                                            </v-chip>
+                                        </template>
+                                        <template slot="item"
+                                                  slot-scope="data">
+                                            <template v-if="typeof data.item !== 'object'">
+                                                <v-list-tile-content v-text="data.item"></v-list-tile-content>
+                                            </template>
+                                            <template v-else>
+                                                <v-list-tile-content>
+                                                    <v-list-tile-title v-html="data.item"></v-list-tile-title>
+                                                    <v-list-tile-sub-title v-html="data.item"></v-list-tile-sub-title>
+                                                </v-list-tile-content>
+                                            </template>
+                                        </template>
+                                    </v-autocomplete>
+                                </v-flex>
+
+                            </v-layout>
+
+                        </v-container>
+                    </v-card-text>
+
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="blue darken-1"
+                               flat
+                               v-on:click="close">
+                            Cancel
+                        </v-btn>
+                        <v-btn color="blue darken-1"
+                               flat
+                               v-on:click="save">
+                            Save
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+        </v-toolbar>
+
+        <v-data-table :headers="headers"
+                      :items="items" class="elevation-1">
+            <template slot="items" slot-scope="props">
+                <row>
+                    <cell>{{ props.item.UserName }}</cell>
+                    <cell>{{ props.item.FirstName }}</cell>
+                    <cell>{{ props.item.LastName }}</cell>
+                    <cell>{{ props.item.CustomerNumbers }}</cell>
+                    <cell>{{ props.item.ActivationDate }}</cell>
+                    <cell>{{ props.item.LastActivityDate }}</cell>
+                    <cell>{{ props.item.Roles.join(', ') }}</cell>
+                    <cell>{{ props.item.Email }}</cell>
+                    <cell>
+                        <v-icon small class="mr-2" v-on:click="editItem(props.item)">
+                            edit
+                        </v-icon>
+                    </cell>
+                </row>
+            </template>
+        </v-data-table>
+    </div>
+</template>
+
+<script>
+    var dataGridDemo = Vue.component('comp-admin-users-datagrid',
+        {
+        name: 'comp-admin-users-datagrid',
+        template: '#AdminUsersDataGrid',
+        data: function () {
+            return {
+                dialog: false,
+                headers: @Html.Raw(jsonFields),
+                items: @Html.Raw(jsonItems),
+                customerNumbersArray: @Html.Raw(jsonCustomers),
+                roles: @Html.Raw(jsonRoles),
+                pagination: {
+                    rowsPerPage: 25,
+                },
+                editedIndex: -1,
+                editedItem: {
+                    Id: 0,
+                    FirstName: '',
+                    LastName: '',
+                    PhoneNumber: '',
+                    UserName: '',
+                    ActivationDate: '',
+                    LastActivityDate: '',
+                    Email: '',
+                    CustomerNumbers: '',
+                    Roles: ''
+                },
+                defaultItem: {
+                    Id: 0,
+                    FirstName: '',
+                    LastName: '',
+                    PhoneNumber: '',
+                    UserName: '',
+                    ActivationDate: '',
+                    LastActivityDate: '',
+                    Email: '',
+                    CustomerNumbers: '',
+                    Roles: ''
+                }
+            }
+        },
+        computed: {
+            formTitle: function() {
+                return this.editedIndex === -1 ? 'New Item' : 'Edit Item';
+            }
+        },
+        watch: {
+            dialog: function(val) {
+                val || this.close();
+            }
+        },
+        mount: {
+
+        },
+        methods: {
+            editItem: function(item) {
+                console.log("clicked:", item.UserId, item);
+                this.editedIndex = this.items.indexOf(item);
+                this.editedItem = Object.assign({}, item);
+                this.editedItem.CustomerNumbers = this.editedItem.CustomerNumbers.split(',');
+                this.dialog = true;
+            },
+            close: function() {
+                this.dialog = false;
+                setTimeout(function () {
+                        this.editedItem = Object.assign({}, this.defaultItem);
+                        this.editedIndex = -1;}, 300);
+            },
+            save: function() {
+                if (this.editedIndex > -1) {
+                    var success = this.onSave(this.editedItem);
+                    if (success) {
+                        Object.assign(this.items[this.editedIndex], this.editedItem);
+                    }
+
+                } else {
+                    var success = this.onSave(this.editedItem);
+                    if (success) {
+                        this.items.push(this.editedItem);
+                    }
+                }
+                this.close();
+            },
+            onSave: function (aitem) {
+                api({
+                    method: 'post',
+                    url: '/Admin/OnSaveUser',
+                    data: {
+                        "Id": aitem.Id,
+                        "FirstName": aitem.FirstName,
+                        "LastName": aitem.LastName,
+                        "UserName": aitem.UserName,
+                        "Email": aitem.Email,
+                        "CellPhoneNumber": aitem.CellPhoneNumber,
+                        "PhoneNumber": aitem.PhoneNumber,
+                        "CustomerNumbers": aitem.CustomerNumbers.toString(),
+                        "Roles": aitem.Roles
+                    }
+                })
+                .then( function(response) {
+                    console.log("Saved user response:" ,response);
+                    if (response) {
+                        location.reload();
+                    }
+                });
+            },
+            removeCustNum: function (item) {
+                console.log(item);
+                var index = this.editedItem.CustomerNumbers.indexOf(item);
+                if (index >= 0) this.editedItem.CustomerNumbers.splice(index, 1);
+            }
+        }
+
+    });
+</script>

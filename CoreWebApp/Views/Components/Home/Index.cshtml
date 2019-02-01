@@ -1,0 +1,98 @@
+﻿@model Habufa_Extranet.Models.ViewModels.HomeIndexViewModel
+@{
+    var jsonItems = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Newsletters);
+}
+
+<template id="HomeIndex">
+    <v-container grid-list-md>
+        <v-layout row wrap>
+            @if (Model.Notifications.Any())
+            {
+                <v-flex md12 lg5>
+                    <material-card color="orange"
+                                   title="Notifications"
+                                   text="Notifications">
+                        <v-expansion-panel-content v-for="(item,i) in 5"
+                                                   :key="i">
+                            <div slot="header">Item</div>
+                            <v-card>
+                                <v-card-text>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</v-card-text>
+                            </v-card>
+                        </v-expansion-panel-content>
+                        <v-data-table :items="" hide-actions>
+                            <template slot="items" slot-scope="{index, item}">
+                                <td>{{ item.concept }}</td>
+                                <td class="text-xs-right">{{ item.MessageNL }}</td>
+                                <td class="text-xs-right">{{ item.TitleNL }}</td>
+                                <td class="text-xs-right">{{ item.StartDate }}</td>
+                            </template>
+                        </v-data-table>
+                    </material-card>
+                </v-flex>
+            }
+            <v-flex md12 lg12 xl6>
+                <material-card color="blue"
+                               title="Comments"
+                               text="Comments submitted by users">
+                    Empty
+                </material-card>
+
+            </v-flex>
+
+            <v-flex md12 lg12 xl6>
+                <material-card color="red"
+                               title="Newsletter"
+                               text="Recent newsletters">
+                    <v-data-table :headers="headers"
+                                  :items="items" hide-actions>
+                        <template slot="items" slot-scope="props">
+                            <row>
+                                <cell>{{props.item.WeekNumber}}</cell>
+                                <cell>{{props.item.Title}}</cell>
+                                <cell>{{props.item.Concept}}</cell>
+                                <cell>{{props.item.Country}}</cell>
+                                <cell>{{props.item.Language}}</cell>
+                                <cell class="justify-center">
+                                    <v-icon small class="mr-2" v-on:click="openNewsletter(props.item.Id)">
+                                        fa-eye
+                                    </v-icon>
+                                </cell>
+                            </row>
+                        </template>
+                    </v-data-table>
+                    <v-btn href="/Newsletter/">View all</v-btn>
+                </material-card>
+            </v-flex>
+
+        </v-layout>
+    </v-container>
+</template>
+
+<script>
+var homeindex = Vue.component('home-index',
+    {
+        template: '#HomeIndex',
+        data: function () {
+            return {
+                loading: false,
+                rowsPerPage:[10, 25, 50, { "text": "$vuetify.dataIterator.rowsPerPageAll", "value": -1 }],
+                headers:  [
+                    {text: 'Week Number', align: 'left', value: 'WeekNumber'},
+                    { text: 'Title', value: 'Title' },
+                    { text: 'Concept', value: 'Concept' },
+                    { text: 'Country', value: 'Country' },
+                    { text: 'Language', value: 'Language' },
+                    { text: 'Actions', value: '' }
+                ],
+                items: @Html.Raw(jsonItems)
+            }
+        },
+        methods: {
+            openNewsletter: function (id) {
+                console.log(id);
+                window.location.href = "/Newsletter/View/"+id;
+            }
+        }
+
+    });
+</script>
