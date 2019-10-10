@@ -1,6 +1,4 @@
-﻿@using System.Threading.Tasks
-@model Habufa_Extranet.Data.NotificationViewModel
-
+﻿
 
 <template id="NotificationCreate">
     <v-form>
@@ -136,22 +134,6 @@
                     menu: false,
                     menu2: false,
 
-                    notification: {
-                        Id: @Model.Id,
-                        Concept: '@Model.Concept',
-                        Country: '@Model.Country',
-                        Name: '@Model.Name',
-                        MessageNL: '@Model.MessageNL',
-                        MessageEN: '@Model.MessageEN',
-                        MessageFR: '@Model.MessageFR',
-                        MessageDE: '@Model.MessageDE',
-                        TitleNL: '@Model.TitleNL',
-                        TitleEN: '@Model.TitleEN',
-                        TitleFR: '@Model.TitleFR',
-                        TitleDE: '@Model.TitleDE',
-                        StartDate: '@Model.StartDate',
-                        EndDate: '@Model.EndDate'
-                    },
                     loader: false
                 }
             },
@@ -159,9 +141,9 @@
                 formIsValid: function () {
                     return (
                         this.notification.Concept &&
-                            this.notification.Country);
+                        this.notification.Country);
                 },
-                header: function(){
+                header: function () {
                     if (this.notification.Id == 0) {
                         return "Create a notification";
                     }
@@ -178,7 +160,7 @@
                 saveNotification: function (anotification) {
 
                     var self = this;
-                    console.log(anotification,"self>",self.notification);
+                    console.log(anotification, "self>", self.notification);
 
                     api({
                         method: 'post',
@@ -204,7 +186,7 @@
                     })
                         .then(function (response) {
                             if (response) {
-                                console.log("success",response);
+                                console.log("success", response);
                                 self.notification.Id = response.data;
                                 app.showSnackbar('success', 'Saved succesfully!');
                                 window.location.href = "/Notification/Edit/" + self.notification.Id;

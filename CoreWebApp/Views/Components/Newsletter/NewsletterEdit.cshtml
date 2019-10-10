@@ -1,7 +1,4 @@
-﻿@model Habufa_Extranet.Data.Newsletter
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿
 
 <template id="NewsletterCreate">
     <v-form>
@@ -101,18 +98,7 @@
             template: '#NewsletterCreate',
             data: function () {
                 return {
-                    newsletter: {
-                        Id: @Model.Id,
-                        Concept: '@Html.Raw(Model.Concept)',
-                        Country: '@Model.Country',
-                        Language: '@Model.Language',
-                        Status: '@Model.State',
-                        Title: '@Html.Raw(Model.Title)',
-                        Week: '@Model.WeekNumber',
-                        DateSent: '@Model.LastSentDate',
-                        Role: '@Model.Role',
-                        Content: "@Html.Raw(Model.Content)"
-                    },
+
                     loader: false
                 }
             },
@@ -126,7 +112,7 @@
                         this.newsletter.Concept &&
                         this.newsletter.Title);
                 },
-                header: function(){
+                header: function () {
                     if (this.newsletter.Id == 0) {
                         return "Create a newsletter";
                     }
@@ -160,7 +146,7 @@
                     })
                         .then(function (response) {
                             if (response) {
-                                console.log("success",response);
+                                console.log("success", response);
                                 self.newsletter.Id = response.data;
                                 app.showSnackbar('success', 'Saved succesfully!');
                                 window.location.href = "/Newsletter/Edit/" + self.newsletter.Id;

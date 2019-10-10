@@ -1,7 +1,4 @@
-﻿@model Habufa_Extranet.Models.ViewModels.HomeIndexViewModel
-@{
-    var jsonItems = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Newsletters);
-}
+﻿
 
 <template id="HomeIndex">
     <v-container grid-list-md>
@@ -69,30 +66,30 @@
 </template>
 
 <script>
-var homeindex = Vue.component('home-index',
-    {
-        template: '#HomeIndex',
-        data: function () {
-            return {
-                loading: false,
-                rowsPerPage:[10, 25, 50, { "text": "$vuetify.dataIterator.rowsPerPageAll", "value": -1 }],
-                headers:  [
-                    {text: 'Week Number', align: 'left', value: 'WeekNumber'},
-                    { text: 'Title', value: 'Title' },
-                    { text: 'Concept', value: 'Concept' },
-                    { text: 'Country', value: 'Country' },
-                    { text: 'Language', value: 'Language' },
-                    { text: 'Actions', value: '' }
-                ],
-                items: @Html.Raw(jsonItems)
-            }
-        },
-        methods: {
-            openNewsletter: function (id) {
-                console.log(id);
-                window.location.href = "/Newsletter/View/"+id;
-            }
-        }
+    var homeindex = Vue.component('home-index',
+        {
+            template: '#HomeIndex',
+            data: function () {
+                return {
+                    loading: false,
+                    rowsPerPage: [10, 25, 50, { "text": "$vuetify.dataIterator.rowsPerPageAll", "value": -1 }],
+                    headers: [
+                        { text: 'Week Number', align: 'left', value: 'WeekNumber' },
+                        { text: 'Title', value: 'Title' },
+                        { text: 'Concept', value: 'Concept' },
+                        { text: 'Country', value: 'Country' },
+                        { text: 'Language', value: 'Language' },
+                        { text: 'Actions', value: '' }
+                    ],
 
-    });
+                }
+            },
+            methods: {
+                openNewsletter: function (id) {
+                    console.log(id);
+                    window.location.href = "/Newsletter/View/" + id;
+                }
+            }
+
+        });
 </script>

@@ -1,107 +1,12 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@inject IMenuItemRepository MenuManager
-@inject UserManager<MyUser> _UserManager
-@{
-    var user = await _UserManager.GetUserAsync(User);
-    var jsonSideBarItems = Newtonsoft.Json.JsonConvert.SerializeObject(MenuManager.GetSideBarMenu().ToList());
-}
+@*inject IMenuItemRepository MenuManager
+    @inject UserManager<MyUser> _UserManager
+
+        var user = await _UserManager.GetUserAsync(User);
+        var jsonSideBarItems = Newtonsoft.Json.JsonConvert.SerializeObject(MenuManager.GetSideBarMenu().ToList());
+    }*@
 <template id="navigation">
     <div id="navigation-container">
-        @* Drawer  *@
-        <v-navigation-drawer :clipped="drawer.clipped"
-                             :fixed="drawer.fixed"
-                             :permanent="drawer.permanent"
-                             :mini-variant="drawer.mini"
-                             v-model="drawer.open"
-                             color="blue-grey"
-                             fixed
-                             app>
-
-            <v-list class="pa-1">
-                <v-list-tile avatar tag="div" href="/Identity/Account/Manage">
-                    <v-list-tile-avatar>
-                        <img src="/images/avatars/user.jpg" />
-                    </v-list-tile-avatar>
-
-                    <v-list-tile-content>
-                        <v-list-tile-title>@user.FirstName @user.LastName</v-list-tile-title>
-                    </v-list-tile-content>
-                </v-list-tile>
-            </v-list>
-            <v-list class="">
-                <div v-if="userconcepts != '' ">
-
-                    <v-list-tile>
-                        <v-list-tile-content>
-                            <v-select :items="usercustomers"
-                                      :menu-props="{ maxHeight: '400' }"
-                                      v-model="activeCustNum"
-                                      item-value="CustomerId"
-                                      class=""
-                                      label="Active Dealer">
-                                <template slot="selection" slot-scope="data">
-                                    <div class="body-1 text-capitalize text-truncate font-weight-thin">
-                                        {{ data.item.CustomerId }}, {{ data.item.Name1 }}
-                                    </div>
-                                </template>
-                                <template slot="item" slot-scope="data">
-                                    <v-list-tile-content>
-                                        <v-list-tile-title v-html="`${data.item.CustomerId}, ${data.item.Name1}`">
-                                        </v-list-tile-title>
-                                    </v-list-tile-content>
-                                </template>
-                            </v-select>
-                        </v-list-tile-content>
-                    </v-list-tile>
-                    <v-chip small v-for="concept in userconcepts.split(',')">
-                        <v-avatar>
-                            <img :src="getSmallImage(concept)" style="height:12px; width:12px;">
-                        </v-avatar>
-                        {{concept}}
-                    </v-chip>
-                </div>
-            </v-list>
-            <v-list class="pt-0">
-                <div class="item" v-for="item in items"
-                     :key="item.MenuTitle">
-
-                    <v-list-tile v-if="item.Menus.length === 0 " :href="item.MenuAction">
-                        <v-list-tile slot="activator">
-                            <v-list-tile-title>{{item.MenuTitle}}</v-list-tile-title>
-                        </v-list-tile>
-
-                        <v-list-tile-action v-if="item.Icon">
-                            <v-icon :size="iconsize">{{ item.Icon }}</v-icon>
-                        </v-list-tile-action>
-
-                        <v-list-tile-content>
-                            <v-list-tile-title> {{ item.MenuTitle }}</v-list-tile-title>
-                        </v-list-tile-content>
-                    </v-list-tile>
-
-                    <v-list-group v-if="item.Menus.length">
-
-                        <v-list-tile slot="activator">
-                            <v-list-tile-title>
-                                {{item.MenuTitle}}
-                            </v-list-tile-title>
-                        </v-list-tile>
-
-                        <v-list-tile :href="subitem.MenuAction"
-                                     class=""
-                                     v-for="(subitem, i) in item.Menus"
-                                     :key="i">
-                            <v-list-tile-action>
-                                <v-icon :size="iconsize" text="subitem.MenuTitle">{{subitem.Icon}}</v-icon>
-                            </v-list-tile-action>
-                            <v-list-tile-title>{{subitem.MenuTitle}}</v-list-tile-title>
-                        </v-list-tile>
-
-                    </v-list-group>
-                </div>
-            </v-list>
-        </v-navigation-drawer>
-        @* End Side Drawer *@
 
         @* Top Navigation *@
         <v-toolbar fixed app>
@@ -152,7 +57,7 @@
     var sideBar = Vue.component('comp-navigation',
         {
             template: '#navigation',
-            data: function() {
+            data: function () {
                 return {
                     iconsize: 12,
                     drawer: {
@@ -163,9 +68,9 @@
                         mini: false
                     },
                     right: null,
-                    items: @Html.Raw(jsonSideBarItems),
+                    items: '',
                     activeCustNum: {
-                        CustomerId: '@user.ActiveCustomerNumber'
+                        CustomerId: ''
                     },
                     shoppingCartItems: 1
                 }
@@ -175,52 +80,52 @@
                 userconcepts: String,
             },
             computed: {
-                selectedCustomer: function (){
+                selectedCustomer: function () {
                     return this.usercustomers.find(cust => cust.CustomerId === this.activeCustNum);
                 }
             },
             methods: {
-                addShoppingCart: function(){
+                addShoppingCart: function () {
                     this.shoppingCartItems = this.shoppingCartItems + 1;
                 },
-                logout: function() {
+                logout: function () {
                     document.getElementById("logout").submit();
                 },
-                updateActiveCustomer: function (val){
+                updateActiveCustomer: function (val) {
                     console.log(val);
                     var self = this;
                     api({
-                            method: 'post',
-                            url: '/Secure/UpdateActiveCustomer',
-                            data: {
-                                customerNumber: val
-                            }
-                        })
-                        .then( function(response) {
+                        method: 'post',
+                        url: '/Secure/UpdateActiveCustomer',
+                        data: {
+                            customerNumber: val
+                        }
+                    })
+                        .then(function (response) {
                             if (response.data) {
                                 setCookie("activeCustomerNumber", response.data, 1);
                                 location.reload();
                             }
                         })
-                        .catch(function(error) {
+                        .catch(function (error) {
                             app.showSnackbar('red', error);
 
                         });
                 },
-                updateUserActivity: function (){
+                updateUserActivity: function () {
                     api({
-                            method: 'get',
-                            url: '/Secure/UpdateUserActivity'
+                        method: 'get',
+                        url: '/Secure/UpdateUserActivity'
+                    })
+                        .then(function (response) {
                         })
-                        .then( function(response) {
-                        })
-                        .catch(function(error) {
+                        .catch(function (error) {
                             app.showSnackbar('red', error);
                         });
                 },
-                activate: function() {
+                activate: function () {
                     var that = this;
-                    setTimeout(function() {
+                    setTimeout(function () {
                         that.updateUserActivity();
                     }, 1500);
                 },
@@ -248,7 +153,7 @@
                     setCookie("drawer", val, 1);
                 },
             },
-            mounted: function() {
+            mounted: function () {
                 console.log(document.cookie);
                 this.activate();
             }

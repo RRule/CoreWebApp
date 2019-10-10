@@ -1,13 +1,4 @@
-﻿@using System.Threading.Tasks
-@model Habufa_Extranet.Models.ViewModel.GridUserViewModel
-
-@{
-    var jsonFields = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Headers);
-    var jsonItems = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Users);
-    var jsonRoles = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Roles);
-    var jsonCustomers = Newtonsoft.Json.JsonConvert.SerializeObject(Model.CustomerNumbers);
-}
-
+﻿
 
 <template id="AdminUsersDataGrid">
     <div>
@@ -186,116 +177,114 @@
 <script>
     var dataGridDemo = Vue.component('comp-admin-users-datagrid',
         {
-        name: 'comp-admin-users-datagrid',
-        template: '#AdminUsersDataGrid',
-        data: function () {
-            return {
-                dialog: false,
-                headers: @Html.Raw(jsonFields),
-                items: @Html.Raw(jsonItems),
-                customerNumbersArray: @Html.Raw(jsonCustomers),
-                roles: @Html.Raw(jsonRoles),
-                pagination: {
-                    rowsPerPage: 25,
-                },
-                editedIndex: -1,
-                editedItem: {
-                    Id: 0,
-                    FirstName: '',
-                    LastName: '',
-                    PhoneNumber: '',
-                    UserName: '',
-                    ActivationDate: '',
-                    LastActivityDate: '',
-                    Email: '',
-                    CustomerNumbers: '',
-                    Roles: ''
-                },
-                defaultItem: {
-                    Id: 0,
-                    FirstName: '',
-                    LastName: '',
-                    PhoneNumber: '',
-                    UserName: '',
-                    ActivationDate: '',
-                    LastActivityDate: '',
-                    Email: '',
-                    CustomerNumbers: '',
-                    Roles: ''
-                }
-            }
-        },
-        computed: {
-            formTitle: function() {
-                return this.editedIndex === -1 ? 'New Item' : 'Edit Item';
-            }
-        },
-        watch: {
-            dialog: function(val) {
-                val || this.close();
-            }
-        },
-        mount: {
+            name: 'comp-admin-users-datagrid',
+            template: '#AdminUsersDataGrid',
+            data: function () {
+                return {
+                    dialog: false,
 
-        },
-        methods: {
-            editItem: function(item) {
-                console.log("clicked:", item.UserId, item);
-                this.editedIndex = this.items.indexOf(item);
-                this.editedItem = Object.assign({}, item);
-                this.editedItem.CustomerNumbers = this.editedItem.CustomerNumbers.split(',');
-                this.dialog = true;
+                    pagination: {
+                        rowsPerPage: 25,
+                    },
+                    editedIndex: -1,
+                    editedItem: {
+                        Id: 0,
+                        FirstName: '',
+                        LastName: '',
+                        PhoneNumber: '',
+                        UserName: '',
+                        ActivationDate: '',
+                        LastActivityDate: '',
+                        Email: '',
+                        CustomerNumbers: '',
+                        Roles: ''
+                    },
+                    defaultItem: {
+                        Id: 0,
+                        FirstName: '',
+                        LastName: '',
+                        PhoneNumber: '',
+                        UserName: '',
+                        ActivationDate: '',
+                        LastActivityDate: '',
+                        Email: '',
+                        CustomerNumbers: '',
+                        Roles: ''
+                    }
+                }
             },
-            close: function() {
-                this.dialog = false;
-                setTimeout(function () {
+            computed: {
+                formTitle: function () {
+                    return this.editedIndex === -1 ? 'New Item' : 'Edit Item';
+                }
+            },
+            watch: {
+                dialog: function (val) {
+                    val || this.close();
+                }
+            },
+            mount: {
+
+            },
+            methods: {
+                editItem: function (item) {
+                    console.log("clicked:", item.UserId, item);
+                    this.editedIndex = this.items.indexOf(item);
+                    this.editedItem = Object.assign({}, item);
+                    this.editedItem.CustomerNumbers = this.editedItem.CustomerNumbers.split(',');
+                    this.dialog = true;
+                },
+                close: function () {
+                    this.dialog = false;
+                    setTimeout(function () {
                         this.editedItem = Object.assign({}, this.defaultItem);
-                        this.editedIndex = -1;}, 300);
-            },
-            save: function() {
-                if (this.editedIndex > -1) {
-                    var success = this.onSave(this.editedItem);
-                    if (success) {
-                        Object.assign(this.items[this.editedIndex], this.editedItem);
-                    }
+                        this.editedIndex = -1;
+                    }, 300);
+                },
+                save: function () {
+                    if (this.editedIndex > -1) {
+                        var success = this.onSave(this.editedItem);
+                        if (success) {
+                            Object.assign(this.items[this.editedIndex], this.editedItem);
+                        }
 
-                } else {
-                    var success = this.onSave(this.editedItem);
-                    if (success) {
-                        this.items.push(this.editedItem);
+                    } else {
+                        var success = this.onSave(this.editedItem);
+                        if (success) {
+                            this.items.push(this.editedItem);
+                        }
                     }
+                    this.close();
+                },
+                onSave: function (aitem) {
+                    api({
+                        method: 'post',
+                        url: '/Admin/OnSaveUser',
+                        data: {
+                            "Id": aitem.Id,
+                            "FirstName": aitem.FirstName,
+                            "LastName": aitem.LastName,
+                            "UserName": aitem.UserName,
+                            "Email": aitem.Email,
+                            "CellPhoneNumber": aitem.CellPhoneNumber,
+                            "PhoneNumber": aitem.PhoneNumber,
+                            "CustomerNumbers": aitem.CustomerNumbers.toString(),
+                            "Roles": aitem.Roles
+                        }
+                    })
+                        .then(function (response) {
+                            console.log("Saved user response:", response);
+                            if (response) {
+                                location.reload();
+                            }
+                        });
+                },
+                removeCustNum: function (item) {
+                    console.log(item);
+                    var index = this.editedItem.CustomerNumbers.indexOf(item);
+                    if (index >= 0) this.editedItem.CustomerNumbers.splice(index, 1);
                 }
-                this.close();
-            },
-            onSave: function (aitem) {
-                api({
-                    method: 'post',
-                    url: '/Admin/OnSaveUser',
-                    data: {
-                        "Id": aitem.Id,
-                        "FirstName": aitem.FirstName,
-                        "LastName": aitem.LastName,
-                        "UserName": aitem.UserName,
-                        "Email": aitem.Email,
-                        "CellPhoneNumber": aitem.CellPhoneNumber,
-                        "PhoneNumber": aitem.PhoneNumber,
-                        "CustomerNumbers": aitem.CustomerNumbers.toString(),
-                        "Roles": aitem.Roles
-                    }
-                })
-                .then( function(response) {
-                    console.log("Saved user response:" ,response);
-                    if (response) {
-                        location.reload();
-                    }
-                });
-            },
-            removeCustNum: function (item) {
-                console.log(item);
-                var index = this.editedItem.CustomerNumbers.indexOf(item);
-                if (index >= 0) this.editedItem.CustomerNumbers.splice(index, 1);
             }
-        }
 
-    });
+        });
 </script>

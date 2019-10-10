@@ -1,7 +1,4 @@
-﻿@model Habufa_Extranet.Controllers.OrderDetailPageViewModel
-@{
-    var jsonItems = Newtonsoft.Json.JsonConvert.SerializeObject(Model.OrderLines);
-}
+﻿
 <template id="DataGridOrderLines">
     <div>
 
@@ -47,37 +44,36 @@
 
 <script>
     var datagridorderlines = Vue.component('datagridorderlines',
-    {
-        template: '#DataGridOrderLines',
-        data: function () {
-            return {
-                loading: false,
-                search: '',
-                rowsPerPage: [99],
-                pagination: {
-                    sortBy: 'orderdate',
-                    descending: true
-                },
-                headers: [
-                    { text: 'Artikelnr', align: 'left', value: 'ProdId' },
-                    { text: 'Artikelomschrijving', value: 'ProdDscr' },
-                    { text: 'Aantal', value: 'Quantity' },
-                    { text: 'Stuksprijs', value: 'Price' },
-                    { text: 'Korting', value: 'Discount' },
-                    { text: 'Totaal', value: 'TotalPrice' }
+        {
+            template: '#DataGridOrderLines',
+            data: function () {
+                return {
+                    loading: false,
+                    search: '',
+                    rowsPerPage: [99],
+                    pagination: {
+                        sortBy: 'orderdate',
+                        descending: true
+                    },
+                    headers: [
+                        { text: 'Artikelnr', align: 'left', value: 'ProdId' },
+                        { text: 'Artikelomschrijving', value: 'ProdDscr' },
+                        { text: 'Aantal', value: 'Quantity' },
+                        { text: 'Stuksprijs', value: 'Price' },
+                        { text: 'Korting', value: 'Discount' },
+                        { text: 'Totaal', value: 'TotalPrice' }
 
-                ],
-                items: @Html.Raw(jsonItems),
+                    ],
+                }
+            },
+            props: {
+                currency: String,
+                totalprice: String
+
+            },
+            methods: {
+
             }
-        },
-        props: {
-            currency: String,
-            totalprice: String
 
-        },
-        methods: {
-
-        }
-
-    });
+        });
 </script>
