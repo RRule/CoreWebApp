@@ -23,6 +23,9 @@ Starting from the default ASPNET Core Angular application:
 7. open projectname.csproj, edit `ClientApp` to `client-app`
 8. start debug
 
+If error occurs:
+https://github.com/SoftwareAteliers/asp-net-core-vue-starter/issues/3
+
 ps;
 add new file  `tsconfig.json` in client-app
 contents:
