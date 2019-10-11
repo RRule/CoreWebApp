@@ -67,13 +67,12 @@ contents:
   ]
 }`
 
+*Typescript:*
 - install `npm add typscript` and/or `npm add eslint`
 - edit .csproj file and add
-`
-  <ItemGroup>
-    <Content Include="ClientApp\tsconfig.json" />
-  </ItemGroup>
-`
+`  <ItemGroup>`
+`    <Content Include="ClientApp\tsconfig.json" />`
+`  </ItemGroup>`
 
 
 For more info and tips try:
