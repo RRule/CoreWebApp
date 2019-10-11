@@ -65,10 +65,23 @@ contents:
   "exclude": [
     "node_modules"
   ]
-}
+}`
+
+- install `npm add typscript` and/or `npm add eslint`
+- edit .csproj file and add
+`
+  <ItemGroup>
+    <Content Include="ClientApp\tsconfig.json" />
+  </ItemGroup>
 `
 
 
 For more info and tips try:
 https://wildermuth.com/2019/04/08/Using-Vue-CLI-Inside-an-ASP-NET-Core-Project
 
+
+
+Setup Vue pages:
+1. Add folder `views` and `components`
+2. Add `HelloWorld.vue`in views
+3. 
